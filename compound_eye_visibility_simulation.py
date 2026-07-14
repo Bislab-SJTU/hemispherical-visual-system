@@ -5,14 +5,14 @@ experiments.
 Two experiments are supported:
 1. fixed-angle: one incidence angle, multiple source-center distances.
 Example:
-    python CompoundEyeVisibilitySimulation.py fixed-angle \
+    python compound_eye_visibility_simulation.py fixed-angle \
     --incidence-angle 40 \
     --distance-range 20 120 2 \
     --output-dir output_fixed_angle_40
 
 2. fixed-distance: one source-center distance, multiple incidence angles.
 Example:
-    python CompoundEyeVisibilitySimulation.py fixed-distance \
+    python compound_eye_visibility_simulation.py fixed-distance \
     --distance 60 \
     --angle-range 0 90 10 \
     --output-dir output_fixed_distance_60

@@ -13,8 +13,7 @@ Each list file contains one noisy/clean pair per line:
     relative/path/to/noisy.png relative/path/to/clean.png
 
 Example:
-    cd src
-    python Train_sphereuformer.py \
+    python train_sphereuformer.py \
       --dataset_root_dir ./MPEG7dataset/sce/all \
       --output_dir runs/denoise \
       --num_epochs 15 \

@@ -1,34 +1,85 @@
+# SphereUFormer Compound-Eye Denoising
+
+This repository provides the core code for compound-eye dataset simulation and SphereUFormer denoising. Supporting scripts for visibility simulation and eye tracking are also included.
+
 ## Contents
 
-- `DatasetsSimulator.py`  
-  Generates binary-shape datasets under a regular compound-eye forward model. The script produces `ideal`, `perfect`, and `noisy` images, and also writes `train_list.txt`, `val_list.txt`, and `test_list.txt`.
+- `dataset_simulator.py`: generates `ideal`, `perfect`, and `noisy` images and creates the train, validation, and test lists.
+- `train_sphereuformer.py`: trains SphereUFormer using paired noisy and ideal images.
+- `compound_eye_visibility_simulation.py`: simulates compound-eye visibility under controlled source geometry.
+- `eye_tracking.py` and `eye_motion.ino`: perform gaze estimation and optional servo-based eye motion.
 
-- `CompoundEyeVisibilitySimulation.py`  
-  Simulates variable-field-of-view visibility on a hemispherical compound eye under controlled source geometry.
+## 1. System Requirements
 
-- `Train_sphereuformer.py`  
-  Trains a SphereUFormer-based denoiser from paired noisy/clean grayscale images stored in the dataset format produced by `DatasetsSimulator.py`.
+The simulation and training workflow was tested with Ubuntu 20.04.6 LTS, Python 3.8.16, PyTorch 2.0.1, Torchvision 0.15.2, and CUDA 11.7. All remaining Python dependencies and tested version numbers are listed in `requirements.txt`.
 
-- `Eye_tracking.py`  
-  Tracks binocular foreground responses from sequential images, estimates centroid-based hemispherical angles, maps them to calibrated gaze values, and optionally sends servo commands.
+An NVIDIA CUDA-capable GPU is recommended for full training. Dataset simulation and the compact demonstration can run on a CPU. No non-standard hardware is required for simulation or training. The optional eye-motion experiment requires a camera, an Arduino-compatible controller, a PCA9685 servo driver, and two-axis eye servos.
 
-- `Eye_motion.ino`  
-  Arduino firmware for the servo controller used by `Eye_tracking.py`. It receives serial `X...Y...` commands and converts them into calibrated dual-axis eye motion.
+The required SphereUFormer modules are included in `network/` and `trimesh_utils.py`. Their third-party license is provided in `SPHERE_UFORMER_LICENSE`.
 
-## Minimal Workflow
+## 2. Installation
 
-1. Generate a synthetic dataset:
+Run all commands from this directory.
 
 ```bash
-python DatasetsSimulator.py \
+conda create -n sphere_network python=3.8.16 pip -y
+conda activate sphere_network
+python -m pip install torch==2.0.1 torchvision==0.15.2 \
+    --index-url https://download.pytorch.org/whl/cu117
+python -m pip install -r requirements.txt
+```
+
+For CPU-only execution, replace the PyTorch command with:
+
+```bash
+python -m pip install torch==2.0.1+cpu torchvision==0.15.2+cpu \
+    --index-url https://download.pytorch.org/whl/cpu
+```
+
+Typical installation time is 5-15 minutes on a normal desktop computer.
+
+## 3. Demo
+
+The MPEG-7 CE Shape-1 Part B dataset contains 1,400 binary silhouette images from 70 object categories, with 20 images per category. Place these images in `./MPEG7dataset/original`. If the downloaded archive also contains `shapedata.gif` and `confusions.gif`, exclude these two overview images.
+
+Generate the complete simulated dataset:
+
+```bash
+python dataset_simulator.py \
     --input-root ./MPEG7dataset/original \
     --output-root ./MPEG7dataset/sce/all
 ```
 
-2. Train the denoising model:
+The expected output contains 1,400 `ideal`, 1,400 `perfect`, and 1,400 `noisy` PNG images. The default deterministic 80/10/10 split produces 1,120 training, 140 validation, and 140 test pairs.
+
+Run the compact CPU demonstration:
 
 ```bash
-python Train_sphereuformer.py \
+python train_sphereuformer.py \
+    --dataset_root_dir ./MPEG7dataset/sce/all \
+    --output_dir runs/demo \
+    --num_epochs 1 \
+    --batch_size 2 \
+    --num_workers 0 \
+    --limit_train_batches 0 \
+    --img_rank 3 \
+    --num_scales 2 \
+    --scale_depth 1 \
+    --d_head_coef 1 \
+    --enc_num_heads 2 4 \
+    --dec_num_heads 8 4 \
+    --use_checkpoint 0 \
+    --no_gpu
+```
+
+Expected outputs are epoch-wise loss and PSNR values, `runs/demo/best.pt`, and `runs/demo/last.pt`. Full dataset simulation typically takes approximately 1-3 minutes on a desktop CPU; the compact training demonstration typically completes within 2 minutes.
+
+## 4. Instructions for Use
+
+Train SphereUFormer with the manuscript configuration:
+
+```bash
+python train_sphereuformer.py \
     --dataset_root_dir ./MPEG7dataset/sce/all \
     --output_dir runs/denoise \
     --num_epochs 15 \
@@ -36,11 +87,7 @@ python Train_sphereuformer.py \
     --learning_rate 5e-5
 ```
 
-
-
-## Dataset Format
-
-The denoising dataset root is expected to contain:
+The dataset root has the following structure:
 
 ```text
 dataset_root/
@@ -52,8 +99,8 @@ dataset_root/
     xxx_ideal_256x256.png
 ```
 
-Each split file contains one paired sample per line:
+Each split file contains one noisy/clean pair per line. To reproduce training, retain the generated split files and the default split seed (`42`).
 
-```text
-relative/path/to/noisy.png relative/path/to/clean.png
-```
+## License
+
+This project is released under the MIT License in `LICENSE`. The included SphereUFormer components retain their original MIT license in `SPHERE_UFORMER_LICENSE`.
