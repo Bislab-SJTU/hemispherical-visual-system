@@ -16,9 +16,9 @@ import time
 from torch import einsum, Tensor
 from trimesh import Trimesh
 
-from network.position_encoding import GlobalVerticalPositionEnconding
-from network.sphere_psa import SphereSelfAttention
-from trimesh_utils import get_icosphere, IcoSphereRef, asSpherical
+from network_fig3a.position_encoding import GlobalVerticalPositionEnconding
+from network_fig3a.sphere_psa import SphereSelfAttention
+from trimesh_utils_fig3a import get_icosphere, IcoSphereRef, asSpherical
 
 
 class MLP(nn.Module):

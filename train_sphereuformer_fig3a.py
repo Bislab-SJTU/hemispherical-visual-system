@@ -13,7 +13,7 @@ Each list file contains one noisy/clean pair per line:
     relative/path/to/noisy.png relative/path/to/clean.png
 
 Example:
-    python train_sphereuformer.py \
+    python train_sphereuformer_fig3a.py \
       --dataset_root_dir ./MPEG7dataset/sce/all \
       --output_dir runs/denoise \
       --num_epochs 15 \
@@ -39,8 +39,8 @@ SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from network.sphere_model import SphereUFormer
-from trimesh_utils import IcoSphereRef, asSpherical
+from network_fig3a.sphere_model import SphereUFormer
+from trimesh_utils_fig3a import IcoSphereRef, asSpherical
 
 
 MEAN = 0.5

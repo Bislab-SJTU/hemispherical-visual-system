@@ -6,8 +6,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
-from network.position_encoding import RelativePositionBias
-from trimesh_utils import IcoSphereRef
+from network_fig3a.position_encoding import RelativePositionBias
+from trimesh_utils_fig3a import IcoSphereRef
 
 
 class SphereSelfAttention(nn.Module):

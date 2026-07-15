@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch import nn, Tensor
 from tqdm import tqdm
 
-from trimesh_utils import IcoSphereRef, asSpherical
+from trimesh_utils_fig3a import IcoSphereRef, asSpherical
 
 
 def get_rotation_matrices(rphitheta: np.ndarray) -> np.ndarray:

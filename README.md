@@ -4,10 +4,10 @@ This repository provides the core code for compound-eye dataset simulation and S
 
 ## Contents
 
-- `dataset_simulator.py`: generates `ideal`, `perfect`, and `noisy` images and creates the train, validation, and test lists.
-- `train_sphereuformer.py`: trains SphereUFormer using paired noisy and ideal images.
-- `compound_eye_visibility_simulation.py`: simulates compound-eye visibility under controlled source geometry.
-- `eye_tracking.py` and `eye_motion.ino`: perform gaze estimation and optional servo-based eye motion.
+- `dataset_simulator_fig3a.py`: generates `ideal`, `perfect`, and `noisy` images and creates the train, validation, and test lists used for Fig. 3a.
+- `train_sphereuformer_fig3a.py`: trains SphereUFormer using paired noisy and ideal images for Fig. 3a.
+- `compound_eye_visibility_simulation_fig4h.py`: simulates compound-eye visibility under controlled source geometry for Fig. 4h.
+- `eye_tracking_fig5.py` and `eye_motion_fig5.ino`: perform gaze estimation and optional servo-based eye motion for Fig. 5.
 
 ## 1. System Requirements
 
@@ -15,7 +15,7 @@ The simulation and training workflow was tested with Ubuntu 20.04.6 LTS, Python 
 
 An NVIDIA CUDA-capable GPU is recommended for full training. Dataset simulation and the compact demonstration can run on a CPU. No non-standard hardware is required for simulation or training. The optional eye-motion experiment requires a camera, an Arduino-compatible controller, a PCA9685 servo driver, and two-axis eye servos.
 
-The required SphereUFormer modules are included in `network/` and `trimesh_utils.py`. Their third-party license is provided in `SPHERE_UFORMER_LICENSE`.
+The required SphereUFormer modules are included in `network_fig3a/` and `trimesh_utils_fig3a.py`. Their third-party license is provided in `SPHERE_UFORMER_LICENSE`.
 
 ## 2. Installation
 
@@ -40,12 +40,12 @@ Typical installation time is 5-15 minutes on a normal desktop computer.
 
 ## 3. Demo
 
-The MPEG-7 CE Shape-1 Part B dataset contains 1,400 binary silhouette images from 70 object categories, with 20 images per category. Place these images in `./MPEG7dataset/original`. If the downloaded archive also contains `shapedata.gif` and `confusions.gif`, exclude these two overview images.
+The datasets used in this study are available at [Hugging Face](https://huggingface.co/datasets/SJTU-Ramos/hemispherical_visual_system_datasets/tree/main). The MPEG-7 CE Shape-1 Part B dataset contains 1,400 binary silhouette images from 70 object categories, with 20 images per category. Place these images in `./MPEG7dataset/original`. If the downloaded archive also contains `shapedata.gif` and `confusions.gif`, exclude these two overview images.
 
 Generate the complete simulated dataset:
 
 ```bash
-python dataset_simulator.py \
+python dataset_simulator_fig3a.py \
     --input-root ./MPEG7dataset/original \
     --output-root ./MPEG7dataset/sce/all
 ```
@@ -55,7 +55,7 @@ The expected output contains 1,400 `ideal`, 1,400 `perfect`, and 1,400 `noisy` P
 Run the compact CPU demonstration:
 
 ```bash
-python train_sphereuformer.py \
+python train_sphereuformer_fig3a.py \
     --dataset_root_dir ./MPEG7dataset/sce/all \
     --output_dir runs/demo \
     --num_epochs 1 \
@@ -79,7 +79,7 @@ Expected outputs are epoch-wise loss and PSNR values, `runs/demo/best.pt`, and `
 Train SphereUFormer with the manuscript configuration:
 
 ```bash
-python train_sphereuformer.py \
+python train_sphereuformer_fig3a.py \
     --dataset_root_dir ./MPEG7dataset/sce/all \
     --output_dir runs/denoise \
     --num_epochs 15 \

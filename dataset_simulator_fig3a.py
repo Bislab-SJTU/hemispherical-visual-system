@@ -9,7 +9,7 @@ project:
 4. apply edge-aware dropout noise.
 
 Example:
-    python dataset_simulator.py \
+    python dataset_simulator_fig3a.py \
         --input-root ./MPEG7dataset/original \
         --output-root ./MPEG7dataset/sce/all
 """
